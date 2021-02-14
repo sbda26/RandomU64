@@ -21,7 +21,7 @@ namespace RandomU64
 
         static void Main(string[] args)
         {
-            Func<ulong>[] arr_Methods = { Method1, Method2, Method3, Method4, Method5 };
+            Func<ulong>[] arr_Methods = { Method1, Method2, Method3, Method4, Method5, Method6 };
 
             Console.WriteLine(string.Format("{0} iterations for each method.", _ciIterations));
 
@@ -41,11 +41,10 @@ namespace RandomU64
 
         static double RunMethod(Func<ulong> MethodX)
         {
-            ulong ulResult;
             DateTime dtStart = DateTime.Now;
 
             for (int iCount = 1; iCount <= _ciIterations; iCount++)
-                ulResult = MethodX.Invoke();
+                _ = MethodX.Invoke();
 
             return (DateTime.Now - dtStart).TotalMilliseconds;
         }
@@ -88,8 +87,17 @@ namespace RandomU64
         }
 
         // *********************************************************************************************************************************************************************************************************************************************************
-      
+
         static ulong Method1()
+        {
+            ulong ulResult = 0;
+
+            for (int iIndex = 0; iIndex < 32; iIndex++)
+                ulResult += Convert.ToUInt64((uint)_clsRandom.Next(int.MinValue, int.MaxValue));
+
+            return ulResult;
+        }
+        static ulong Method2()
         {
             /*
              * 1) Get signed 32-bit random integer x1 between -(2^31 + 1) and +(2^31 - 1)
@@ -111,7 +119,7 @@ namespace RandomU64
             return y;
         }
 
-        static ulong Method2()
+        static ulong Method3()
         {
             /*
              * 1) ulResult = 0
@@ -140,7 +148,7 @@ namespace RandomU64
             return ulResult;
         }
 
-        static ulong Method3()  // only difference between #3 and #2 is that this one (#3) uses .Next() instead of .NextDouble()
+        static ulong Method4()  // only difference between #4 and #3 is that this one (#4) uses .Next() instead of .NextDouble()
         {
             /*
              * 1) ulResult = 0
@@ -159,7 +167,7 @@ namespace RandomU64
             return ulResult;
         }
 
-        static ulong Method4()
+        static ulong Method5()
         {
             /*
              * 1) Create 8-element byte[] array (each element is 8 bits)
@@ -183,7 +191,7 @@ namespace RandomU64
             [System.Runtime.InteropServices.FieldOffset(0)] public uint UInt32;
         }
 
-        static ulong Method5()
+        static ulong Method6()
         {
             /*
              * evil.Int32 and evil.UInt32 occupy same space in memory (aka unions). So, any change to one immediately changes the other

@@ -9,9 +9,9 @@ namespace RandomU64
 {
     class Program
     {
-        static private Random _random = new Random();
+        private static readonly Random _random = new Random();
 
-        private const int ITERATIONS = 100000;
+        private const int _ITERATIONS = 100000;
 
         private struct TotalsStructure
         {
@@ -19,23 +19,22 @@ namespace RandomU64
             public double TotalMilliseconds;
         }
 
-        private static List<TotalsStructure> millisecondTotalsList = new List<TotalsStructure>();
+        private static readonly List<TotalsStructure> millisecondTotalsList = new List<TotalsStructure>();
 
-
-        static void Main(string[] args)
+        static void Main()
         {
             Func<ulong>[] arr_Methods = { Method1, Method2, Method3, Method4, Method5, Method6 };
 
-            Console.WriteLine(string.Format("{0} iterations for each method.", ITERATIONS));
+            Console.WriteLine(string.Format("{0} iterations for each method.", _ITERATIONS));
 
             foreach(Func<ulong> methodX in arr_Methods)
             {
-                string MethodName = methodX.Method.Name;
+                string methodName = methodX.Method.Name;
                 double totalMilliseconds = RunMethod(methodX);
 
-                PrintHeader(MethodName);
+                PrintHeader(methodName);
                 PrintFooter(totalMilliseconds);
-                AddToStatsList(MethodName, totalMilliseconds);
+                AddToStatsList(methodName, totalMilliseconds);
             }    
 
             PrintStats();
@@ -46,7 +45,7 @@ namespace RandomU64
         {
             DateTime startTime = DateTime.Now;
 
-            for (int count = 1; count <= ITERATIONS; count++)
+            for (int count = 1; count <= _ITERATIONS; count++)
                 _ = MethodX.Invoke();
 
             return (DateTime.Now - startTime).TotalMilliseconds;
@@ -84,7 +83,6 @@ namespace RandomU64
                 else
                     Console.WriteLine();
             }
-
         }
 
         // *********************************************************************************************************************************************************************************************************************************************************
@@ -115,8 +113,8 @@ namespace RandomU64
 
             // lines must be separated or result won't go past 2^32
             y = (uint)x1;
-            y = y << 32;
-            y = y | (uint)x2;
+            y <<= 32;
+            y |= (uint)x2;
 
             return y;
         }
@@ -143,7 +141,7 @@ namespace RandomU64
                 {
                     double dValue = Math.Pow(2, power);
                     ulong ulValue = Convert.ToUInt64(dValue);
-                    result = result | ulValue;
+                    result |= ulValue;
                 }
             }
 
@@ -164,7 +162,7 @@ namespace RandomU64
 
             for (int power = 0; power < 64; power++)
                 if (_random.Next(0, 1) == 1)
-                    result = result | Convert.ToUInt64(Math.Pow(2, power));
+                    result |= Convert.ToUInt64(Math.Pow(2, power));
 
             return result;
         }
@@ -205,13 +203,13 @@ namespace RandomU64
              * 5) result = result | evil.UInt32
             */
             var evil = new EvilUnion();
-            ulong result = 0;
+            ulong result;
 
             evil.Int32 = _random.Next(int.MinValue, int.MaxValue);
             result = evil.UInt32;
-            result = result << 32;
+            result <<= 32;
             evil.Int32 = _random.Next(int.MinValue, int.MaxValue);
-            result = result | evil.UInt32;
+            result |= evil.UInt32;
 
             return result;
         }
